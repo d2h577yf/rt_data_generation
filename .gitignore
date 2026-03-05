@@ -1,0 +1,121 @@
+### Deep Learning template
+# =========================
+# IDEs & Editors (JetBrains + VS Code)
+# =========================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+gen/
+cmake-build-*/
+.run/
+workspace.xml
+tasks.xml
+.vscode/
+*.code-workspace
+.history/
+
+# =========================
+# Operating Systems (macOS + Linux + Windows)
+# =========================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =========================
+# Python Specifics
+# =========================
+# Byte-compiled / optimized
+__pycache__/
+*.py[codz]
+*$py.class
+
+# C extensions & Packaging
+*.so
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Jupyter & Tooling
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+
+# =========================
+# CUDA Specifics
+# =========================
+*.i
+*.ii
+*.gpu
+*.ptx
+*.cubin
+*.fatbin
+
+# =========================
+# Deep Learning Data & Logs
+# =========================
+# Datasets and Models
+data/
+datasets/
+weights/
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.engine
+
+# 3D, Point Cloud & Signal Data
+*.ply
+*.pcd
+
+# Logs and Metrics
+logs/
+runs/
+wandb/
+lightning_logs/
+tensorboard/
+
+# output
+output/

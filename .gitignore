@@ -96,7 +96,7 @@ ENV/
 # =========================
 # Datasets and Models
 data/
-datasets/
+dataset/
 weights/
 checkpoints/
 *.pt

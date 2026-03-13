@@ -120,3 +120,14 @@ tensorboard/
 # output
 output/
 RF-3DGS-tutorial.ipynb
+
+# Container
+.cache
+.config
+.drjit
+.ipython
+.keras
+.local
+.nv
+.bash_history
+.jupyter

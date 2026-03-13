@@ -1,7 +1,11 @@
-FROM nvcr.io/nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
+FROM docker.io/nvidia/cuda:12.8.0-cudnn-devel-ubuntu24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
+
+# 【提速核心 1】针对 Ubuntu 24.04 (DEB822 格式) 的清华源替换，彻底解决 apt 卡死
+RUN sed -i 's/archive.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list.d/ubuntu.sources && \
+    sed -i 's/security.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list.d/ubuntu.sources
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     software-properties-common \
@@ -9,24 +13,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     wget \
     curl \
-    # OpenCV 依赖
-    libgl1-mesa-glx \
+    build-essential \
+    ninja-build \
+    # --- 核心替换：用 libgl1 代替 libgl1-mesa-glx ---
+    libgl1 \
+    # -------------------------------------------
     libglib2.0-0 \
     libsm6 \
     libxext6 \
     libxrender-dev \
     libgomp1 \
-    # 图形和渲染依赖
+    # 图形和渲染依赖 (Ubuntu 24.04 下这些名字依然有效)
     libglu1-mesa \
     libxi6 \
     libxrandr2 \
     libxinerama1 \
     libxcursor1 \
-    && add-apt-repository ppa:deadsnakes/ppa -y \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
+    # Python 及其开发头文件
     python3.12 \
-    python3.12-venv \
     python3.12-dev \
     && rm -rf /var/lib/apt/lists/*
 
@@ -34,31 +38,22 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
+# 优先拷贝配置文件
 COPY pyproject.toml uv.lock ./
 
 ENV UV_PROJECT_ENVIRONMENT=/app/.venv
-RUN uv sync --frozen --python 3.12
+ENV UV_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+
+# 【提速核心 3】只同步环境依赖，不安装当前项目。把这一步变成稳固的 Docker 缓存层
+RUN UV_HTTP_TIMEOUT=300 UV_HTTP_RETRIES=5 uv sync --python 3.12 --no-install-project
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-# 创建非 root 用户以兼容 podman
-RUN useradd -m -u 1000 -s /bin/bash appuser && \
-    chown -R appuser:appuser /app
+# 将项目自身安装进环境（因为前面依赖已经装好了，这一步会非常快）
+RUN uv sync --python 3.12
 
-# 复制项目文件
-COPY --chown=appuser:appuser . .
-
-USER appuser
-
+RUN uv pip install jupyterlab
 # 暴露 Jupyter Lab 端口
 EXPOSE 8888
 
-# 配置 Jupyter Lab (开发模式，禁用 token)
-# 生产环境建议设置密码或使用 token
-CMD ["jupyter", "lab", \
-     "--ip=0.0.0.0", \
-     "--port=8888", \
-     "--no-browser", \
-     "--ServerApp.token=''", \
-     "--ServerApp.password=''", \
-     "--ServerApp.allow_root=True"]
+

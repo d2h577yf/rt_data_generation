@@ -4,6 +4,7 @@
 podman run --rm -it \
     --device nvidia.com/gpu=3 \
     --userns=keep-id \
+    -e HOME=/tmp \
     -p 8888:8888 \
     -v "$(pwd)":/app:Z \
     rt-data-gen:latest
